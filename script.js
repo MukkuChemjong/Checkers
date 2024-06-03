@@ -107,6 +107,11 @@ document.addEventListener('DOMContentLoaded', function(){
         return false;
     }
 
+    function promoteToQueen(piece){
+        piece.classList.add('queen');
+        piece.innerHtml = piece.classList.contains('piece-black') ? '&#9813;' : '&#9812;';
+    }
+
     checkerBoard.addEventListener('click', function(event){
         const targetCell = event.target.closest('.cell-black, .cell-white');
 
@@ -117,17 +122,26 @@ document.addEventListener('DOMContentLoaded', function(){
             if(isValidMove(clickedRow, clickedCol) && currentPosition.querySelector('.piece') === null){
                 const currentCell = board[currentPosition.row][currentPosition.col];
                 const currentPiece = currentCell.querySelector('.piece');
+                const isQueen = currentPiece.classList('queen').contains;
                 currentPiece.remove();
 
                 const newPiece = document.createElement('div');
                 newPiece.className = `piece piece-${currentPosition.color}`;
                 newPiece.innerHTML = currentPosition.color === 'black' ? '&#9899;' : '&#9898;';
+                if(isQueen){
+                    promoteToQueen(newPiece);
+                }
                 targetCell.appendChild(newPiece);
 
                 currentPosition = { row: clickedRow, col: clickedCol, color: currentPosition.color };
 
+                if(!isQueen && ((currentPosition.color === 'black' && clickedRow === 7)||(currentPosition.color === 'white' && clickedRow === 0))){
+                    promoteToQueen(newPiece);
+                }
+
                 turn = (turn === 'white')?'black':'white';
-                updatePaths();
+                paths = [];
+                capturePaths = [];
             }
         }
     });
