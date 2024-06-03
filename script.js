@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function(){
     let path2 = null;
     let capturePath1 = null;
     let capturePath2 = null;
+    let turn = 'white';
 
     const board = [];
     for(let i=0; i<8; i++){
@@ -22,27 +23,32 @@ document.addEventListener('DOMContentLoaded', function(){
                 piece.className = 'piece piece-black';
                 piece.innerHTML = '&#9899;';
 
-                piece.addEventListener('click', function(){
-                    currentPosition = { row: i, col: j, color: 'black' };
-                    updatePaths();
-                });
-
+                attachAddEventListener(piece,'black');
                 cell.appendChild(piece);
             } else if(isBlack && (i === 6 || i === 7)) {
                 const piece = document.createElement('div');
                 piece.className = 'piece piece-white';
                 piece.innerHTML = '&#9898;';
 
-                piece.addEventListener('click', function(){
-                    currentPosition = { row: i, col: j, color: 'white' };
-                    updatePaths();
-                });
-
+                attachAddEventListener(piece,'white');
                 cell.appendChild(piece);
             }
             checkerBoard.appendChild(cell);
             board[i][j] = cell;
         }
+    }
+
+    function attachAddEventListener(piece, color){
+        piece.addEventListener('click', function(){
+            if(color === turn){
+                currentPosition = {
+                    row: parseInt(piece.parentElement.dataset.row),
+                    col: parseInt(piece.parentElement.dataset.col),
+                    color: color
+                }
+                updatePaths();
+            }
+        })
     }
 
     function updatePaths() {
@@ -119,6 +125,8 @@ document.addEventListener('DOMContentLoaded', function(){
                 targetCell.appendChild(newPiece);
 
                 currentPosition = { row: clickedRow, col: clickedCol, color: currentPosition.color };
+
+                turn = (turn === 'white')?'black':'white';
                 updatePaths();
             }
         }
