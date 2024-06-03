@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function(){
             const clickedRow = parseInt(targetCell.dataset.row);
             const clickedCol = parseInt(targetCell.dataset.col);
 
-            if(isValidMove(clickedRow, clickedCol)){
+            if(isValidMove(clickedRow, clickedCol) && currentPosition.querySelector('.piece') === null){
                 const currentCell = board[currentPosition.row][currentPosition.col];
                 const currentPiece = currentCell.querySelector('.piece');
                 currentPiece.remove();
