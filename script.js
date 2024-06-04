@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
     function promoteToQueen(piece){
         piece.classList.add('queen');
-        piece.innerHtml = piece.classList.contains('piece-black') ? '&#9813;' : '&#9812;';
+        piece.innerHTML = piece.classList.contains('piece-black') ? '&#9813;' : '&#9812;';
     }
 
     checkerBoard.addEventListener('click', function(event){
@@ -146,20 +146,17 @@ document.addEventListener('DOMContentLoaded', function(){
             const clickedRow = parseInt(targetCell.dataset.row);
             const clickedCol = parseInt(targetCell.dataset.col);
 
-            if(isValidMove(clickedRow, clickedCol) && currentPosition.querySelector('.piece') === null){
+            if(isValidMove(clickedRow, clickedCol) && targetCell.querySelector('.piece') === null){
                 const currentCell = board[currentPosition.row][currentPosition.col];
                 const currentPiece = currentCell.querySelector('.piece');
                 const isQueen = currentPiece.classList.contains('queen');
-                const isQueen = currentPiece.classList('queen').contains;
                 currentPiece.remove();
 
                 const newPiece = document.createElement('div');
                 newPiece.className = `piece piece-${currentPosition.color}`;
                 newPiece.innerHTML = currentPosition.color === 'black' ? '&#9899;' : '&#9898;';
-                if(isQueen){
-                    promoteToQueen(newPiece);
-                }
                 attachAddEventListener(newPiece, currentPosition.color);
+                
                 if(isQueen){
                     promoteToQueen(newPiece);
                 }
@@ -167,16 +164,13 @@ document.addEventListener('DOMContentLoaded', function(){
 
                 currentPosition = { row: clickedRow, col: clickedCol, color: currentPosition.color };
 
-                if(!isQueen && ((currentPosition.color === 'black' && clickedRow === 7)||(currentPosition.color === 'white' && clickedRow === 0))){
+                if(!isQueen && ((currentPosition.color === 'black' && clickedRow === 7) || (currentPosition.color === 'white' && clickedRow === 0))){
                     promoteToQueen(newPiece);
                 }
 
                 turn = (turn === 'white')?'black':'white';
-                currentPosition = null;
                 paths = [];
                 capturePaths = [];  
-                paths = [];
-                capturePaths = [];
             }
         }
     });
