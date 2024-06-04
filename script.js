@@ -136,8 +136,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
     function promoteToQueen(piece){
         piece.classList.add('queen');
-
-        piece.innerHTML = piece.classList.contains('piece-black') ? '&#9813;' : '&#9812;'
+        piece.innerHtml = piece.classList.contains('piece-black') ? '&#9813;' : '&#9812;';
     }
 
     checkerBoard.addEventListener('click', function(event){
@@ -147,10 +146,11 @@ document.addEventListener('DOMContentLoaded', function(){
             const clickedRow = parseInt(targetCell.dataset.row);
             const clickedCol = parseInt(targetCell.dataset.col);
 
-            if(isValidMove(clickedRow, clickedCol) && targetCell.querySelector('.piece') === null){
+            if(isValidMove(clickedRow, clickedCol) && currentPosition.querySelector('.piece') === null){
                 const currentCell = board[currentPosition.row][currentPosition.col];
                 const currentPiece = currentCell.querySelector('.piece');
                 const isQueen = currentPiece.classList.contains('queen');
+                const isQueen = currentPiece.classList('queen').contains;
                 currentPiece.remove();
 
                 const newPiece = document.createElement('div');
@@ -160,11 +160,14 @@ document.addEventListener('DOMContentLoaded', function(){
                     promoteToQueen(newPiece);
                 }
                 attachAddEventListener(newPiece, currentPosition.color);
+                if(isQueen){
+                    promoteToQueen(newPiece);
+                }
                 targetCell.appendChild(newPiece);
 
                 currentPosition = { row: clickedRow, col: clickedCol, color: currentPosition.color };
 
-                if(!isQueen && ((currentPosition.color === 'black' && clickedRow === 7) || (currentPosition.color === 'white' && clickedRow === 0))){
+                if(!isQueen && ((currentPosition.color === 'black' && clickedRow === 7)||(currentPosition.color === 'white' && clickedRow === 0))){
                     promoteToQueen(newPiece);
                 }
 
@@ -172,13 +175,9 @@ document.addEventListener('DOMContentLoaded', function(){
                 currentPosition = null;
                 paths = [];
                 capturePaths = [];  
+                paths = [];
+                capturePaths = [];
             }
         }
     });
-
-    document.querySelectorAll('.piece').forEach(piece =>{
-        const color = piece.classList.contains('piece-black') ? 'black':'white';
-
-        attachAddEventListener(piece, color);
-    })
 });
