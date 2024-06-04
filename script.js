@@ -1,10 +1,8 @@
 document.addEventListener('DOMContentLoaded', function(){
     const checkerBoard = document.getElementById('checkersboard');
     let currentPosition = null;
-    let path1 = null;
-    let path2 = null;
-    let capturePath1 = null;
-    let capturePath2 = null;
+    let paths = [];
+    let capturePaths = [];
     let turn = 'white';
 
     const board = [];
@@ -52,59 +50,94 @@ document.addEventListener('DOMContentLoaded', function(){
     }
 
     function updatePaths() {
+        paths = [];
+        capturePaths = [];
         const direction = currentPosition.color === 'black' ? 1 : -1;
-        const path1Row = currentPosition.row + direction;
-        const path1Col = currentPosition.col - 1;
-        const path2Row = currentPosition.row + direction;
-        const path2Col = currentPosition.col + 1;
+        const isQueen = board[currentPosition.row][currentPosition.col].querySelector('.queen') !== null;
 
-        path1 = { row: path1Row, col: path1Col };
-        path2 = { row: path2Row, col: path2Col };
+        if(isQueen){
+            addQueenPaths();
+        } else {
+            addPaths(currentPosition.row + direction, currentPosition.col - 1);
+            addPaths(currentPosition.row + direction, currentPosition.col + 1);
 
-        const capturePath1Row = currentPosition.row + 2 * direction;
-        const capturePath1Col = currentPosition.col - 2;
-        const capturePath2Row = currentPosition.row + 2 * direction;
-        const capturePath2Col = currentPosition.col + 2;
+            addCapturePaths(currentPosition.row + 2 * direction, currentPosition.col - 2);
+            addCapturePaths(currentPosition.row + 2 * direction, currentPosition.col + 2);
+        };
+    }
 
-        capturePath1 = { row: capturePath1Row, col: capturePath1Col };
-        capturePath2 = { row: capturePath2Row, col: capturePath2Col };
+    function addQueenPaths(){
+        const directions = [
+            {row: 1, col: 1},
+            {row: 1, col: -1},
+            {row: -1, col: 1},
+            {row: - 1, col: - 1}
+        ]
+
+        directions.forEach(direction =>{
+            for(let i=1;i<8;i++){
+                const newRow = currentPosition.row + direction.row * i;
+                const newCol = currentPosition.col + direction.col * i;
+                if(newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8){
+                    const cell = board[newRow][newCol];
+                    if(cell.querySelector('.piece') === null){
+                        paths.push({newRow,newCol});
+                    } else {
+                        addCapturePaths(newRow + direction.row, newCol + direction.col);
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+        })
+    }
+
+    function addCapturePaths(row, col){
+        if(row >= 0 && row < 8 && col >= 0 && col < 8){
+            const rowDiff = Math.abs(currentPosition.row - row);
+            const colDiff = Math.abs(currentPosition.col - col);
+            if(rowDiff === 2 && colDiff === 2){
+                capturePaths.push({row, col});
+            }
+        }
+    }
+
+    function addPaths(row, col){
+        if(row >= 0 && row < 8 && col >= 0 && col < 8){
+            paths.push({row,col});
+        }
     }
 
     function isValidMove(targetRow, targetCol) {
-        // Check if the target cell is within the bounds of the board
         if (targetRow < 0 || targetRow >= 8 || targetCol < 0 || targetCol >= 8) {
             return false;
         }
 
-        // Check if the target cell matches the simple move paths (one step diagonally)
-        const isPath1 = targetRow === path1.row && targetCol === path1.col;
-        const isPath2 = targetRow === path2.row && targetCol === path2.col;
+        const isPath = paths.some(path => path.row === targetRow && path.col === targetCol);
+        const isCapturePath = capturePaths.some(path => path.row === targetRow && path.col === targetCol);
 
-        // Check if the target cell matches the capture move paths (two steps diagonally)
-        const isCapturePath1 = targetRow === capturePath1.row && targetCol === capturePath1.col;
-        const isCapturePath2 = targetRow === capturePath2.row && targetCol === capturePath2.col;
-
-        // If the target cell matches a simple move path, the move is valid
-        if (isPath1 || isPath2) {
+        if (isPath) {
             return true;
-        } else if (isCapturePath1 || isCapturePath2) {
-            // Calculate the intermediate cell coordinates
-            const capturePath = isCapturePath1 ? capturePath1 : capturePath2;
+        } else if (isCapturePath) {
+            const capturePath = capturePaths.find(path => path.row === targetRow && path.col === targetCol);
             const intermediateRow = (currentPosition.row + capturePath.row) / 2;
             const intermediateCol = (currentPosition.col + capturePath.col) / 2;
             const captureCell = board[intermediateRow][intermediateCol];
             const capturePiece = captureCell.querySelector('.piece');
 
-            // Check if the piece in the intermediate cell is of the opposite color
             if (capturePiece && capturePiece.classList.contains(`piece-${currentPosition.color === 'black' ? 'white' : 'black'}`)) {
-                // If there's an opponent piece to capture, remove it and return true
                 capturePiece.remove();
                 return true;
             }
         }
-
-        // If none of the conditions are met, the move is invalid
         return false;
+    }
+
+    function promoteToQueen(piece){
+        piece.classList.add('queen');
+
+        piece.innerHTML = piece.classList.contains('piece-black') ? '&#9813;' : '&#9812;'
     }
 
     checkerBoard.addEventListener('click', function(event){
@@ -114,21 +147,38 @@ document.addEventListener('DOMContentLoaded', function(){
             const clickedRow = parseInt(targetCell.dataset.row);
             const clickedCol = parseInt(targetCell.dataset.col);
 
-            if(isValidMove(clickedRow, clickedCol)){
+            if(isValidMove(clickedRow, clickedCol) && targetCell.querySelector('.piece') === null){
                 const currentCell = board[currentPosition.row][currentPosition.col];
                 const currentPiece = currentCell.querySelector('.piece');
+                const isQueen = currentPiece.classList.contains('queen');
                 currentPiece.remove();
 
                 const newPiece = document.createElement('div');
                 newPiece.className = `piece piece-${currentPosition.color}`;
                 newPiece.innerHTML = currentPosition.color === 'black' ? '&#9899;' : '&#9898;';
+                if(isQueen){
+                    promoteToQueen(newPiece);
+                }
+                attachAddEventListener(newPiece, currentPosition.color);
                 targetCell.appendChild(newPiece);
 
                 currentPosition = { row: clickedRow, col: clickedCol, color: currentPosition.color };
 
+                if(!isQueen && ((currentPosition.color === 'black' && clickedRow === 7) || (currentPosition.color === 'white' && clickedRow === 0))){
+                    promoteToQueen(newPiece);
+                }
+
                 turn = (turn === 'white')?'black':'white';
-                updatePaths();
+                currentPosition = null;
+                paths = [];
+                capturePaths = [];  
             }
         }
     });
+
+    document.querySelectorAll('.piece').forEach(piece =>{
+        const color = piece.classList.contains('piece-black') ? 'black':'white';
+
+        attachAddEventListener(piece, color);
+    })
 });
