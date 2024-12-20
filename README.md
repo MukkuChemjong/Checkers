@@ -1,1 +1,1 @@
-# Chess
+# A game of Checkers
