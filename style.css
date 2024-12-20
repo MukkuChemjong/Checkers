@@ -1,24 +1,38 @@
-.grid {
+.checkers-board {
     display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    grid-template-rows: repeat(8, 1fr);
-    gap: 2px;
-    width: 400px; /* Adjust width as needed */
-    height: 400px; /* Adjust height as needed */
+    grid-template-columns: repeat(8, 60px);
+    grid-template-rows: repeat(8, 60px);
+}
+
+.cell {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.cell-black {
+    background-color: #d18b47;
 }
 
 .cell-white {
-    background-color: #eee;
-    border: 1px solid #ccc;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    background-color: #ffce9e;
 }
 
-.cell-black{
-    background-color: black;
-    border: 1px solid #ccc;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.piece {
+    font-size: 40px;
+}
+
+.piece-black {
+    color: black;
+}
+
+.piece-white {
+    color: white;
+}
+
+.cell-highlight {
+    background-color: #76baff !important;
 }
